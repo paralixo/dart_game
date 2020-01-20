@@ -1,0 +1,21 @@
+{
+  "name": "dart_game",
+  "version": "1.0.0",
+  "description": "TP Dart Game",
+  "main": "cli.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc -w",
+    "start": "node cli.js"
+  },
+  "author": "Florian Lafuente",
+  "license": "ISC",
+  "devDependencies": {
+    "prompt": "^1.0.0",
+    "readline-sync": "^1.4.10",
+    "tslint": "^5.20.1",
+    "tslint-config-airbnb": "^5.11.2",
+    "typescript": "^3.7.5"
+  },
+  "dependencies": {}
+}
