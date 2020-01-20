@@ -1,5 +1,5 @@
 export interface IGamemode {
-    id: number | string
+    id: number
     mode: string
     name: string
     currentPlayerId: null | string | number

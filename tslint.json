@@ -8,8 +8,8 @@
     "rulesDirectory": [],
     "linterOptions": {
         "exclude": [
-            "bin",
-            "lib/*generated.js"
+            "node_modules",
+            ".idea"
         ]
     }
 }

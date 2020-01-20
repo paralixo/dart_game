@@ -1,5 +1,5 @@
 export interface IPlayer {
-    id: number | string
+    id: number
     name: string
     email: string // Format email à valider
     gameWin: number

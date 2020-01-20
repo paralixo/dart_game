@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w",
-    "start": "node cli.js"
+    "start": "node cli.js",
+    "lint": "tslint -c tslint.json '.'"
   },
   "author": "Florian Lafuente",
   "license": "ISC",
