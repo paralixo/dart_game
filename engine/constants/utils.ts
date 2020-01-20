@@ -1,1 +1,1 @@
-export const EMPTY_STRING: string = ''
+export const EMPTY_STRING = '';

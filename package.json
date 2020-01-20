@@ -4,19 +4,29 @@
   "description": "TP Dart Game",
   "main": "cli.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tsc -w",
-    "start": "node cli.js",
-    "lint": "tslint -c tslint.json '.'"
+    "ts-watch": "tsc -w",
+    "dev": "node cli.js",
+    "start": "tsc && node cli.js",
+    "lint": "eslint --fix --ext .ts ."
   },
   "author": "Florian Lafuente",
   "license": "ISC",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.17.0",
+    "@typescript-eslint/parser": "^2.17.0",
+    "eslint": "^6.8.0",
     "prompt": "^1.0.0",
     "readline-sync": "^1.4.10",
-    "tslint": "^5.20.1",
-    "tslint-config-airbnb": "^5.11.2",
     "typescript": "^3.7.5"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint",
+      "git add"
+    ]
+  }
 }

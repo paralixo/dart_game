@@ -1,3 +1,3 @@
-export const DRAFT: string = 'draft'
-export const STARTED: string = 'started'
-export const ENDED: string = 'ended'
+export const DRAFT = 'draft';
+export const STARTED = 'started';
+export const ENDED = 'ended';
