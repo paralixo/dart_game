@@ -4,7 +4,7 @@ export interface IGamePlayer {
   gameId: number;
   remainingShots: number | null;
   score: number;
-  rank: null | number;
+  rank: number;
   order: number;
   createdAt: Date;
 }

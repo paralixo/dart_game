@@ -10,4 +10,15 @@ export class Gamemode301 extends Gamemode{
   public handleShot(gamePlayer: GamePlayer, shot: GameShot): any {
     console.log("tralala")
   }
+
+  initializeStatus(gamePlayers: GamePlayer[]): void {
+  }
+
+  didIWin(playerId: number): boolean {
+    return false;
+  }
+
+  getScoreTable(gamePlayers: GamePlayer[], players: Player[]): object[] {
+    return [];
+  }
 }

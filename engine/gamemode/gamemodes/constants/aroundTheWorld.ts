@@ -1,0 +1,1 @@
+export const FIRST_SECTOR_TO_UNLOCK: number = 1;

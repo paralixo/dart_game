@@ -5,7 +5,7 @@ import {Player} from '../player/Player';
 import {GameShot} from '../game/GameShot';
 import {GamePlayer} from '../game/GamePlayer';
 
-export abstract class Gamemode implements IGamemode{
+export abstract class Gamemode implements IGamemode {
   public id = 0;
   public mode = EMPTY_STRING;
   public name = 'Partie';
@@ -14,4 +14,7 @@ export abstract class Gamemode implements IGamemode{
   public createdAt = new Date();
 
   abstract handleShot(gamePlayer: GamePlayer, shot: GameShot): any;
+  abstract initializeStatus(gamePlayers: GamePlayer[]): void
+  abstract didIWin(playerId: number): boolean
+  abstract getScoreTable(gamePlayers: GamePlayer[], players: Player[]): object[]
 }

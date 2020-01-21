@@ -5,8 +5,8 @@
   "main": "cli.ts",
   "scripts": {
     "ts-watch": "tsc -w",
-    "dev": "node cli.js",
-    "start": "tsc && node cli.js",
+    "dev": "node dist/cli.js",
+    "start": "tsc && node dist/cli.js",
     "lint": "eslint --fix --ext .ts ."
   },
   "author": "Florian Lafuente",

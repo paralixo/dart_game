@@ -5,9 +5,19 @@ import {GameShot} from '../../game/GameShot';
 import {GamePlayer} from '../../game/GamePlayer';
 
 export class Cricket extends Gamemode{
+  getScoreTable(gamePlayers: GamePlayer[], players: Player[]): object[] {
+    return [];
+  }
   public mode = CRICKET;
 
   public handleShot(gamePlayer: GamePlayer, shot: GameShot): any {
     console.log("tralala")
+  }
+
+  initializeStatus(gamePlayers: GamePlayer[]): void {
+  }
+
+  didIWin(playerId: number): boolean {
+    return false;
   }
 }
