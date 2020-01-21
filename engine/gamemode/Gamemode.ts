@@ -13,8 +13,8 @@ export abstract class Gamemode implements IGamemode {
   public status = DRAFT;
   public createdAt = new Date();
 
-  abstract handleShot(gamePlayer: GamePlayer, shot: GameShot): any;
-  abstract initializeStatus(gamePlayers: GamePlayer[]): void
-  abstract didIWin(playerId: number): boolean
+  abstract initializeStatus(gamePlayers: GamePlayer[]): GamePlayer[]
+  abstract handleShot(gamePlayer: GamePlayer, shot: GameShot): GamePlayer;
+  abstract didIWin(gamePlayer: GamePlayer): boolean
   abstract getScoreTable(gamePlayers: GamePlayer[], players: Player[]): object[]
 }

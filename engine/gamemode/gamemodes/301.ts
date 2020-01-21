@@ -3,22 +3,52 @@ import { GAMEMODE_301 } from './constants/modes';
 import {Player} from '../../player/Player';
 import {GameShot} from '../../game/GameShot';
 import {GamePlayer} from '../../game/GamePlayer';
+import {FIRST_SECTOR_TO_UNLOCK} from './constants/aroundTheWorld';
+import {ON_START_SCORE_GAMEMODE_301} from './constants/301';
 
 export class Gamemode301 extends Gamemode{
   public mode = GAMEMODE_301;
 
-  public handleShot(gamePlayer: GamePlayer, shot: GameShot): any {
-    console.log("tralala")
+  initializeStatus(gamePlayers: GamePlayer[]): GamePlayer[] {
+    for (const gamePlayer of gamePlayers) {
+      gamePlayer.score = ON_START_SCORE_GAMEMODE_301;
+    }
+    return gamePlayers;
   }
 
-  initializeStatus(gamePlayers: GamePlayer[]): void {
+  public handleShot(gamePlayer: GamePlayer, shot: GameShot): GamePlayer {
+    const points: number = shot.sector * shot.multiplicator;
+    const scoreAfterShot: number = gamePlayer.score - points;
+
+    const isFinishing: boolean = scoreAfterShot === 0 && shot.multiplicator === 2;
+    if (scoreAfterShot >= 2 || isFinishing) {
+      gamePlayer.score = scoreAfterShot;
+    }
+    return gamePlayer;
   }
 
-  didIWin(playerId: number): boolean {
+  didIWin(gamePlayer: GamePlayer): boolean {
+    if (gamePlayer.score === 0) {
+      return true;
+    }
     return false;
   }
 
   getScoreTable(gamePlayers: GamePlayer[], players: Player[]): object[] {
-    return [];
+    const numberOfPlayers: number = players.length;
+    let table: object[] = [];
+
+    for (const gamePlayer of gamePlayers) {
+      const playerId: number = gamePlayer.playerId;
+      const player: Player = players[playerId];
+
+      table.push({
+                   name: player.name,
+                   score: gamePlayer.score,
+                   rank: gamePlayer.rank
+                 });
+    }
+
+    return table;
   }
 }

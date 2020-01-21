@@ -1,0 +1,1 @@
+export const ON_START_SCORE_GAMEMODE_301: number = 301;

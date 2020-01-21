@@ -10,8 +10,8 @@ export interface IGamemode {
   status: string;
   createdAt: Date;
 
-  handleShot(gamePlayer: GamePlayer, shot: GameShot): any;
-  initializeStatus(gamePlayers: GamePlayer[]): void
-  didIWin(playerId: number): boolean
+  handleShot(gamePlayer: GamePlayer, shot: GameShot): GamePlayer
+  initializeStatus(gamePlayers: GamePlayer[]): GamePlayer[]
+  didIWin(gamePlayer: GamePlayer): boolean
   getScoreTable(gamePlayers: GamePlayer[], players: Player[]): object[]
 }

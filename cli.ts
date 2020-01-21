@@ -18,7 +18,7 @@ const askNumberToUser = (question: string): number => {
 };
 
 const askShotToUser = (question: string): ISectorMultiplicatorShot => {
-    const regex: RegExp = /^([1-3]\*)?([1-9]|1[0-9]|20|25)$/;
+    const regex: RegExp = /^([1-3]\*)?([0-9]|1[0-9]|20|25)$/;
     let promptValue: string;
     do {
         promptValue = readline.question(question);
@@ -42,9 +42,9 @@ const setGame = (): Gamemode => {
         case 0:
             return new AroundTheWorld();
         case 1:
-            return new Cricket();
-        case 2:
             return new Gamemode301();
+        case 2:
+            return new Cricket();
         default:
             return new AroundTheWorld();
     }
@@ -88,35 +88,34 @@ const generatingPlayerOrder = (gamePlayers: GamePlayer[]): GamePlayer[] => {
 };
 
 const isGameOver = (gamePlayers: GamePlayer[]): boolean => {
-  const numberOfRemainingPlayers: any = gamePlayers
-      .filter(gamePlayer => gamePlayer.rank === 0)
-      .length;
-  return numberOfRemainingPlayers <= 1 ? true : false;
+    const numberOfRemainingPlayers: any = gamePlayers
+        .filter(gamePlayer => gamePlayer.rank === 0)
+        .length;
+    return numberOfRemainingPlayers === 1;
 };
 
 const getNextMainLoopIndex = (index: number, numberOfPlayers: number): number => {
-  index++;
-  if (index >= numberOfPlayers) {
-    index = 0;
-  }
-  return index;
+    index++;
+    if (index >= numberOfPlayers) {
+        index = 0;
+    }
+    return index;
 };
 
 const main = (): void => {
     const game: Gamemode = setGame();
     const players: Player[] = setPlayers();
-    const gamePlayers: GamePlayer[] = setGamePlayers(players, game);
-    game.initializeStatus(gamePlayers);
+    let gamePlayers: GamePlayer[] = setGamePlayers(players, game);
+    gamePlayers = game.initializeStatus(gamePlayers);
 
     let index = 0;
     let rankAvailable = 1;
     while (!isGameOver(gamePlayers)) {
-        // get useful data
-        const gamePlayer: GamePlayer = gamePlayers[index];
+        let gamePlayer: GamePlayer = gamePlayers[index];
         const playerId: number = gamePlayer.playerId;
         const player: Player = players[playerId];
 
-        // pass turn is player already won
+        // pass turn if the player already won
         if (gamePlayer.rank !== 0) {
             index = getNextMainLoopIndex(index, players.length);
             continue;
@@ -124,14 +123,14 @@ const main = (): void => {
 
         console.log(`Tour de ${player.name}`);
         do {
-            // handle shot
-            const userInput: ISectorMultiplicatorShot = askShotToUser(`Il te reste ${gamePlayer.remainingShots} coups.\nScore: `);
+            console.table(game.getScoreTable(gamePlayers, players));
+
+            const userInput: ISectorMultiplicatorShot = askShotToUser(`Il te reste ${gamePlayer.remainingShots} coups.\nTir: `);
             gamePlayer.remainingShots--;
             const shot = new GameShot(game.id, player.id, userInput);
-            game.handleShot(gamePlayer, shot);
+            gamePlayer = game.handleShot(gamePlayer, shot);
 
-            // did I win ?
-            const didIWin: boolean = game.didIWin(playerId);
+            const didIWin: boolean = game.didIWin(gamePlayer);
             if (didIWin) {
                 gamePlayer.rank = rankAvailable;
                 rankAvailable++;
@@ -141,17 +140,8 @@ const main = (): void => {
         } while (gamePlayer.remainingShots !== 0);
         gamePlayer.refillShots();
 
-        // debug
-        for (const i in game) {
-            if (i == "playersStatus") {
-                console.log("Debug :");
-                // @ts-ignore
-                console.log(game[i]);
-                console.log("---\n");
-            }
-        }
-
         console.table(game.getScoreTable(gamePlayers, players));
+
         index = getNextMainLoopIndex(index, players.length);
     }
     // TODO: set rank of the last player
