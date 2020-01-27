@@ -1,4 +1,4 @@
-import {IError} from './interfaces/IError';
+import {IError} from '../interfaces/IError';
 
 export const InvalidFormat: IError = {
     error: '400 InvalidFormat',

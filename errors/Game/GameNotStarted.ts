@@ -1,4 +1,4 @@
-import {IError} from './interfaces/IError';
+import {IError} from '../interfaces/IError';
 
 export const GAME_NOT_STARTED: IError = {
     error: '422 GAME_NOT_STARTED',

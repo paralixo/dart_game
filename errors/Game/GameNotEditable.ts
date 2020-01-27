@@ -1,4 +1,4 @@
-import {IError} from './interfaces/IError';
+import {IError} from '../interfaces/IError';
 
 export const GAME_NOT_EDITABLE: IError = {
     error: '410 GAME_NOT_EDITABLE',

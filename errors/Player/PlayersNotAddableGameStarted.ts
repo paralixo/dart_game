@@ -1,4 +1,4 @@
-import {IError} from './interfaces/IError';
+import {IError} from '../interfaces/IError';
 
 export const PLAYERS_NOT_ADDABLE_GAME_STARTED: IError = {
     error: '422 PLAYERS_NOT_ADDABLE_GAME_STARTED',

@@ -1,5 +1,5 @@
 import express from 'express'
-import {NotAcceptable} from '../errors/NotAcceptable';
+import {NotAcceptable} from '../errors/Server/NotAcceptable';
 import Player from '../models/Player';
 
 const router = express.Router()

@@ -1,16 +1,17 @@
 import express from 'express'
 import Player from '../models/Player';
 import Game from '../models/Game';
-import {NotAcceptable} from '../errors/NotAcceptable';
+import {NotAcceptable} from '../errors/Server/NotAcceptable';
 import GameShot from '../models/GameShot';
 import GamePlayer from '../models/GamePlayer';
-import {PLAYERS_NOT_ADDABLE_GAME_STARTED} from '../errors/PlayersNotAddableGameStarted';
-import {PLAYERS_NOT_REMOVABLE_GAME_STARTED} from '../errors/PlayersNotRemovableGameStated';
-import {GAME_NOT_STARTED} from '../errors/GameNotStarted';
-import {GAME_ENDED} from '../errors/GameEnded';
-import {GAME_NOT_STARTABLE} from '../errors/GameNotStartable';
-import {GAME_NOT_EDITABLE} from '../errors/GameNotEditable';
-import {GAME_PLAYER_MISSING} from '../errors/GamePlayerMissing';
+import {PLAYERS_NOT_ADDABLE_GAME_STARTED} from '../errors/Player/PlayersNotAddableGameStarted';
+import {PLAYERS_NOT_REMOVABLE_GAME_STARTED} from '../errors/Player/PlayersNotRemovableGameStated';
+import {GAME_NOT_STARTED} from '../errors/Game/GameNotStarted';
+import {GAME_ENDED} from '../errors/Game/GameEnded';
+import {GAME_NOT_STARTABLE} from '../errors/Game/GameNotStartable';
+import {GAME_NOT_EDITABLE} from '../errors/Game/GameNotEditable';
+import {GAME_PLAYER_MISSING} from '../errors/Player/GamePlayerMissing';
+import {IGamemode} from '../engine/gamemode/interfaces/IGamemode';
 
 const router = express.Router()
 
@@ -87,11 +88,11 @@ router.get('/:id', async (
     const gameId: number = +request.params.id ? +request.params.id : 1;
     const isIncludingGamePlayers: boolean = request.query.include === 'gamePlayers'
 
-    let game: any = await Game.findOne({id: gameId});
+    let game: {[key: string]: any} = await Game.findOne({id: gameId}) as object;
     if (isIncludingGamePlayers) {
-        // TODO: passe mais ne s'assigne pas
         game.gamePlayers = await GamePlayer.find({gameId})
     }
+
     response.format({
         html: () => {
             // TODO: affichage

@@ -1,6 +1,6 @@
 import express from 'express';
 import router from "./router"
-import {NotAcceptable} from './errors/NotAcceptable';
+import {NotAcceptable} from './errors/Server/NotAcceptable';
 import {DatabaseConnection} from './databaseConnection';
 import {Express} from 'express-serve-static-core';
 

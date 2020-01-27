@@ -1,4 +1,4 @@
-import {IError} from './interfaces/IError';
+import {IError} from '../interfaces/IError';
 
 export const GAME_ENDED: IError = {
     error: '422 GAME_ENDED',
