@@ -4,7 +4,7 @@ html
         link(rel='stylesheet', type='text/css', href='../style/style.css')
     body
         h1 Créer une game
-        form(method='post', action='/games', enctype='application/json')
+        form(method='post', action='/games')
             label(for='name') Nom
             input(id='name', name='name', type='text', required= true)
             label(for='mode') Mode

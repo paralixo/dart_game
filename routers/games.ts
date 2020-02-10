@@ -65,6 +65,7 @@ router.post('/', async (
     request,
     response
 ) => {
+    console.log(request.body);
     const name: string = request.body.name ? request.body.name : 'Unknown game';
     const mode: string = request.body.mode ? request.body.mode : 'around-the-world';
 

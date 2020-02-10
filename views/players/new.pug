@@ -3,10 +3,10 @@ html
         title Players
         link(rel='stylesheet', type='text/css', href='../style/style.css')
     body
-        h1 Créer un joueur
+        h1= title
         form(method='post', action='/players', enctype='application/json')
             label(for='name') Nom
-            input(id='name', name='name', type='text', required= true)
+            input(id='name', name='name', type='text', required= true, value=player.name)
             label(for='email') Email
-            input(id='email', name='email', type='text', required= true)
+            input(id='email', name='email', type='text', required= true, value=player.email)
             input(type='submit', value='Valider')

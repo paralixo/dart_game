@@ -58,7 +58,9 @@ router.get('/new', async (
 ) => {
     response.format({
         html: () => {
-            response.render('players/new');
+            const player = {}
+            const title = 'Créer un jouer'
+            response.render('players/new', {player, title});
         },
         json: () => {
             response.send(NotAcceptable)
@@ -89,9 +91,10 @@ router.get('/:id/edit', async (
     const playerId: number = +request.params.id ? +request.params.id : 1;
 
     response.format({
-        html: () => {
-            // TODO: adapt for edit
-            response.render('players/new');
+        html: async () => {
+            const player = await Player.findOne({id: playerId});
+            const title: string = 'Mettre à jour le joueur'
+            response.render('players/new', {player, title});
         },
         json: () => {
             response.send(NotAcceptable)

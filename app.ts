@@ -7,6 +7,7 @@ import {Express} from 'express-serve-static-core';
 const db: DatabaseConnection = new DatabaseConnection();
 const app: Express = express()
 app.use(express.json())
+app.use(express.urlencoded({extended: true}));
 app.use(router);
 app.set('view engine', 'pug');
 app.use(express.static('C:/Users/flori/Desktop/dart_game/assets'));
