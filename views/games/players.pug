@@ -1,0 +1,25 @@
+html
+    head
+        title Games
+        link(rel='stylesheet', type='text/css', href='../style/style.css')
+    body
+        h1 Joueurs de la partie #{gameId}
+        table
+            thead
+                th ID
+                th Nom
+                th Email
+                th Victoires
+                th Défaites
+                th Création
+                th Action
+            tbody
+                each player in players
+                    tr
+                        td #{player.id}
+                        td #{player.name}
+                        td #{player.email}
+                        td #{player.gameWin}
+                        td #{player.gameLost}
+                        td #{player.createdAt}
+                        td TODO: delete player

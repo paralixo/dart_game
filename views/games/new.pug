@@ -1,0 +1,15 @@
+html
+    head
+        title Games
+        link(rel='stylesheet', type='text/css', href='../style/style.css')
+    body
+        h1 Créer une game
+        form(method='post', action='/games', enctype='application/json')
+            label(for='name') Nom
+            input(id='name', name='name', type='text', required= true)
+            label(for='mode') Mode
+            select(id='mode', name='mode', type='text', required= true)
+                option around-the-world
+                option cricket
+                option 301
+            input(type='submit', value='Valider')

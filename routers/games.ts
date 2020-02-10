@@ -38,7 +38,7 @@ router.get('/', async (
     response.format({
         html: () => {
             // TODO: retourner tableau + bouton gestion joueurs
-            response.send('tralalalala');
+            response.render('games/home', { games });
         },
         json: () => {
             response.send(games);
@@ -52,8 +52,8 @@ router.get('/new', async (
 ) => {
     response.format({
         html: () => {
-            // TODO: formulaire création game
-            response.send('create your player')
+            // TODO: send in json to make it work
+            response.render('games/new');
         },
         json: () => {
             response.send(NotAcceptable)
@@ -61,22 +61,20 @@ router.get('/new', async (
     })
 });
 
-router.post('/', (
+router.post('/', async (
     request,
     response
 ) => {
     const name: string = request.body.name ? request.body.name : 'Unknown game';
     const mode: string = request.body.mode ? request.body.mode : 'around-the-world';
 
+    const game = await new Game({name, mode}).save()
     response.format({
         html: () => {
-            // TODO: affichage de la partie crée
-            response.redirect('/games/458712')
+            response.redirect(`/games/${game.id}`)
         },
-        json: async () => {
-            response
-                .status(201)
-                .send(await new Game({name, mode}).save())
+        json: () => {
+            response.status(201).send(game)
         }
     })
 });
@@ -95,8 +93,8 @@ router.get('/:id', async (
 
     response.format({
         html: () => {
-            // TODO: affichage
-            response.send('visualisation game ' + gameId)
+            // TODO: afficher tout le bordel
+            response.render('games/show', {game})
         },
         json: () => {
             response.send(game)
@@ -112,8 +110,8 @@ router.get('/:id/edit', (
 
     response.format({
         html: () => {
-            // TODO: affichage
-            response.send('edit your game ' + gameId)
+            // TODO: send in json to make it work and adapt for update
+            response.render('games/new');
         },
         json: () => {
             response.send(NotAcceptable)
@@ -158,7 +156,7 @@ router.patch('/:id', async (
 
     response.format({
         html: () => {
-            response.redirect('/games/' + gameId)
+            response.redirect(`/games/${gameId}`)
         },
         json: async () => {
             response.status(200).send(newGame)
@@ -195,8 +193,8 @@ router.get('/:id/players', async (
     }
     response.format({
         html: () => {
-            // TODO: affichage
-            response.send('Get all players in game ' + gameId)
+            // TODO: charger les joueurs disponibles
+            response.render(`games/${gameId}/players`, {players, gameId})
         },
         json: () => {
             response.send(players)

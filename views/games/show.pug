@@ -1,0 +1,24 @@
+html
+    head
+        title Games
+        link(rel='stylesheet', type='text/css', href='../style/style.css')
+    body
+        h1 Game #{game.id}
+        table
+            thead
+                tr
+                    th ID
+                    th Nom
+                    th Mode
+                    th Status
+                    th Joueurs
+                    th Creation
+            tbody
+                tr
+                    td #{game.id}
+                    td #{game.name}
+                    td #{game.mode}
+                    td #{game.status}
+                    td #{game.gamePlayers.length}
+                    td #{game.createdAt.toLocaleDateString("fr-FR")}
+        a(href='/games/#{game.id}/players') Gérer les joueurs

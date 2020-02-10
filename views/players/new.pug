@@ -1,0 +1,12 @@
+html
+    head
+        title Players
+        link(rel='stylesheet', type='text/css', href='../style/style.css')
+    body
+        h1 Créer un joueur
+        form(method='post', action='/players', enctype='application/json')
+            label(for='name') Nom
+            input(id='name', name='name', type='text', required= true)
+            label(for='email') Email
+            input(id='email', name='email', type='text', required= true)
+            input(type='submit', value='Valider')

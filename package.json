@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "mongoose": "^5.8.9"
+    "mongoose": "^5.8.9",
+    "pug": "^2.0.4"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

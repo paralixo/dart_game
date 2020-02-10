@@ -1,0 +1,25 @@
+html
+    head
+        title Players
+        link(rel='stylesheet', type='text/css', href='../style/style.css')
+    body
+        h1 Joueurs
+        table
+            thead
+                th ID
+                th Nom
+                th Email
+                th Victoires
+                th Défaites
+                th Création
+                th Actions
+            tbody
+                each player in players
+                    tr
+                        td #{player.id}
+                        td #{player.name}
+                        td #{player.email}
+                        td #{player.gameWin}
+                        td #{player.gameLost}
+                        td #{player.createdAt.toLocaleDateString("fr-FR")}
+                        td TODO: acceder/supprimer

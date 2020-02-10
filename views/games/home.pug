@@ -1,0 +1,24 @@
+html
+    head
+        title Games
+        link(rel='stylesheet', type='text/css', href='style/style.css')
+    body
+        h1 Liste des games
+        table
+            thead
+                tr
+                    th ID
+                    th Nom
+                    th Mode
+                    th Status
+                    th Joueurs
+                    th Creation
+            tbody
+                each game in games
+                    tr
+                        td #{game.id}
+                        td #{game.name}
+                        td #{game.mode}
+                        td #{game.status}
+                        td #{game.gamePlayers.length}
+                        td #{game.createdAt.toLocaleDateString("fr-FR")}

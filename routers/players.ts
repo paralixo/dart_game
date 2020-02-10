@@ -24,8 +24,7 @@ router.get('/', async (
         .limit(limit)
     response.format({
         html: () => {
-            // TODO: retourner tableau
-            response.send('tralalalala');
+            response.render('players/home', {players})
         },
         json: () => {
             response.send(players);
@@ -33,22 +32,22 @@ router.get('/', async (
     });
 });
 
-router.post('/', (
+router.post('/', async (
     request,
     response
 ) => {
     const name: string = request.body.name ? request.body.name : 'Unknown player';
     const email: string = request.body.email ? request.body.email : '';
 
+    const player = await new Player({name, email}).save();
     response.format({
         html: () => {
-            // TODO: affichage du joueur crée
-            response.redirect('/players/458712')
+            response.redirect(`/players/${player.id}`)
         },
-        json: async () => {
+        json: () => {
             response
                 .status(201)
-                .send(await new Player({name, email}).save())
+                .send(player);
         }
     })
 });
@@ -59,8 +58,7 @@ router.get('/new', async (
 ) => {
     response.format({
         html: () => {
-            // TODO: formulaire création player
-            response.send('create your player')
+            response.render('players/new');
         },
         json: () => {
             response.send(NotAcceptable)
@@ -92,8 +90,8 @@ router.get('/:id/edit', async (
 
     response.format({
         html: () => {
-            // TODO: formulaire création player
-            response.send('edit your player ' + playerId)
+            // TODO: adapt for edit
+            response.render('players/new');
         },
         json: () => {
             response.send(NotAcceptable)
