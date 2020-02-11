@@ -4,6 +4,8 @@ html
         link(rel='stylesheet', type='text/css', href='style/style.css')
     body
         h1 Liste des games
+        a(href='/players') Gérer les joueurs
+        a(href='/games/new') Créer une nouvelle partie
         table
             thead
                 tr
@@ -13,6 +15,7 @@ html
                     th Status
                     th Joueurs
                     th Creation
+                    th Actions
             tbody
                 each game in games
                     tr
@@ -22,3 +25,9 @@ html
                         td #{game.status}
                         td #{game.gamePlayers.length}
                         td #{game.createdAt.toLocaleDateString("fr-FR")}
+                        td
+                            p TODO: delete sur la poubelle
+                            a(href= 'games/' + game.id)
+                                img(src='../edit_icon.png')
+                            a(href= 'games/' + game.id)
+                                img(src='../delete_icon.png')

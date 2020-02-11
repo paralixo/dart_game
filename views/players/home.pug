@@ -4,6 +4,7 @@ html
         link(rel='stylesheet', type='text/css', href='../style/style.css')
     body
         h1 Joueurs
+        a(href='/games') Liste des parties
         table
             thead
                 th ID
@@ -23,4 +24,8 @@ html
                         td #{player.gameLost}
                         td #{player.createdAt.toLocaleDateString("fr-FR")}
                         td
-                            i.mdi.mdi-delete
+                            p TODO: delete sur la poubelle
+                            a(href= 'players/' + player.id)
+                                img(src='../edit_icon.png')
+                            a(href= 'players/' + player.id)
+                                img(src='../delete_icon.png')

@@ -12,6 +12,11 @@ import {GAME_NOT_STARTABLE} from '../errors/Game/GameNotStartable';
 import {GAME_NOT_EDITABLE} from '../errors/Game/GameNotEditable';
 import {GAME_PLAYER_MISSING} from '../errors/Player/GamePlayerMissing';
 import {IGamemode} from '../engine/gamemode/interfaces/IGamemode';
+import {AroundTheWorld} from '../engine/gamemode/gamemodes/AroundTheWorld';
+import {Gamemode} from '../engine/gamemode/Gamemode';
+import {IGamePlayer} from '../engine/game/interfaces/IGamePlayer';
+import {Gamemode301} from '../engine/gamemode/gamemodes/301';
+import {Cricket} from '../engine/gamemode/gamemodes/Cricket';
 
 const router = express.Router()
 
@@ -93,9 +98,17 @@ router.get('/:id', async (
     }
 
     response.format({
-        html: () => {
-            // TODO: afficher tout le bordel
-            response.render('games/show', {game})
+        html: async () => {
+            const gamePlayers = await GamePlayer.find({gameId})
+            const players = await Player.find(
+                {
+                    id: {
+                        // @ts-ignore
+                        $in: gamePlayers.map(gamePlayer => gamePlayer.playerId)
+                    }
+                }
+            )
+            response.render('games/show', {game, players})
         },
         json: () => {
             response.send(game)
@@ -129,7 +142,7 @@ router.patch('/:id', async (
     const status: string = request.body.status ? request.body.status : undefined;
     if (game.status !== 'draft') {
         if (status !== undefined) {
-            response.send(GAME_NOT_STARTABLE)
+          response.send(GAME_NOT_STARTABLE)
         }
         response.send(GAME_NOT_EDITABLE)
     }
@@ -144,12 +157,25 @@ router.patch('/:id', async (
         const gamePlayers: any[] = await GamePlayer.find({gameId});
         if (gamePlayers.length >= 2) {
             updateValues.status = status
+            const gamemode: Gamemode = getGameMode(game.mode)
+            generatingPlayerOrder(gamemode.initializeStatus(gamePlayers))
+            let index: number = 0
+            for (const gamePlayer of gamePlayers) {
+                await GamePlayer.updateOne({gameId: gamePlayer.gameId, playerId: gamePlayer.playerId}, gamePlayer)
+                index++
+            }
+
+            const currentPlayerId: number = gamePlayers.find((gamePlayer) => {
+                if(gamePlayer.order === 1)
+                    return gamePlayer.id
+            })
+            await Game.updateOne(game, {currentPlayerId})
         } else {
             response.send(GAME_PLAYER_MISSING)
         }
     }
 
-    const newGame: any = await Game.findOneAndUpdate(
+    const newGame: any = await Game.updateOne(
         {id: gameId},
         updateValues,
         {new: true}
@@ -164,6 +190,32 @@ router.patch('/:id', async (
         }
     })
 });
+
+const getGameMode = (mode: string): Gamemode => {
+    switch (mode) {
+        case 'around-the-world':
+            return new AroundTheWorld()
+        case '301':
+            return new Gamemode301()
+        case 'cricket':
+            return new Cricket()
+        default:
+            return new AroundTheWorld()
+    }
+}
+
+const generatingPlayerOrder = (gamePlayers: IGamePlayer[]): IGamePlayer[] => {
+    const min = 0;
+    const max = gamePlayers.length;
+    const firstPlayerIndex = Math.floor(Math.random() * (max - min) + min);
+    [gamePlayers[min], gamePlayers[firstPlayerIndex]] = [gamePlayers[firstPlayerIndex], gamePlayers[min]];
+
+    const offset: number = 1;
+    for (let i = 0; i < max; i++) {
+        gamePlayers[i].order = i + offset;
+    }
+    return gamePlayers;
+};
 
 router.delete('/:id', async (
     request,
@@ -219,6 +271,7 @@ router.post('/:id/players', async (
     for (const playerId of playersIds) {
         await new GamePlayer({gameId, playerId}).save()
     }
+
     response.format({
         html: () => {
             response.redirect(`/games/${gameId}/players`)

@@ -3,7 +3,9 @@ html
         title Games
         link(rel='stylesheet', type='text/css', href='../style/style.css')
     body
-        h1 Game #{game.id}
+        h1 Partie #{game.id}
+        a(href='/games/' + game.id + '/players') Gérer les joueurs
+        h2 La partie
         table
             thead
                 tr
@@ -21,4 +23,31 @@ html
                     td #{game.status}
                     td #{game.gamePlayers.length}
                     td #{game.createdAt.toLocaleDateString("fr-FR")}
-        a(href='/games/#{game.id}/players') Gérer les joueurs
+
+        h2 Les joueurs
+        table
+            thead
+                th ID
+                th Nom
+                th Email
+                th Victoires
+                th Défaites
+                th Création
+            tbody
+                each player in players
+                    tr
+                        td #{player.id}
+                        td #{player.name}
+                        td #{player.email}
+                        td #{player.gameWin}
+                        td #{player.gameLost}
+                        td #{player.createdAt.toLocaleDateString("fr-FR")}
+
+        h2 Tour de
+        table
+        p Coups restants :
+        p Shot
+        button Tir manqué
+        h2 Historique
+        table
+        button Annuler le dernier tir
