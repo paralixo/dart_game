@@ -111,8 +111,11 @@ router.get('/:id', async (
                 }
             )
 
-            const currentPlayer = gamePlayers.find(gamePlayer => gamePlayer.id === game.currentPlayerId)
-            response.render('games/show', {game, players, currentPlayer})
+            const currentGamePlayer: any = gamePlayers.find(gamePlayer => gamePlayer.id === game.currentPlayerId)
+            const currentPlayer = players.find(player => player.id === currentGamePlayer.playerId)
+            const current = {gamePlayer: currentGamePlayer, player: currentPlayer}
+            const shots = await GameShot.find({gameId})
+            response.render('games/show', {game, players, current, shots})
         },
         json: () => {
             response.send(game)
@@ -266,7 +269,15 @@ router.post('/:id/players', async (
     const gameId: number = +request.params.id ? +request.params.id : 1;
     const game: any = await Game.findOne({id: gameId});
     if (game.status !== 'draft') {
-        response.send(PLAYERS_NOT_ADDABLE_GAME_STARTED)
+        response.format({
+            html: () => {
+                response.render('error', {error: PLAYERS_NOT_ADDABLE_GAME_STARTED})
+            },
+            json: () => {
+                response.send(PLAYERS_NOT_ADDABLE_GAME_STARTED)
+            }
+        })
+        return;
     }
 
     // TODO: verify player exist
@@ -292,7 +303,15 @@ router.delete('/:id/players', async (
     const gameId: number = +request.params.id ? +request.params.id : 1;
     const game: any = await Game.findOne({id: gameId});
     if (game.status !== 'draft') {
-        response.send(PLAYERS_NOT_REMOVABLE_GAME_STARTED)
+        response.format({
+            html: () => {
+                response.render('error', {error: PLAYERS_NOT_REMOVABLE_GAME_STARTED})
+            },
+            json: () => {
+                response.send(PLAYERS_NOT_REMOVABLE_GAME_STARTED)
+            }
+        })
+        return;
     }
 
     // TODO: verify player exist ?

@@ -6,6 +6,10 @@ html
         h1 Partie #{game.id}
         a(href='/games') Retour
         h2 La partie
+        if game.status == 'draft' && players.length >= 2
+            form(method= 'POST', action= '?_method=PATCH')
+                input(name= 'status', type= 'hidden', value='started')
+                button Lancer la partie
         table
             thead
                 tr
@@ -43,30 +47,57 @@ html
                         td #{player.gameLost}
                         td #{player.createdAt.toLocaleDateString("fr-FR")}
 
-        if currentPlayer
-            h2 Tour de #{currentPlayer.name}
+
+        if current
+            h2 Tour de #{current.player.name}
+            h3 Joueur
             table
                 thead
                     th ID
                     th Nom
-                    th Email
-                    th Victoires
-                    th Défaites
-                    th Création
+                    th Tirs restants
+                    th score
                 tbody
                     tr
-                    td #{currentPlayer.id}
-                    td #{currentPlayer.name}
-                    td #{currentPlayer.email}
-                    td #{currentPlayer.gameWin}
-                    td #{currentPlayer.gameLost}
-                    td #{currentPlayer.createdAt.toLocaleDateString("fr-FR")}
+                        td #{current.player.id}
+                        td #{current.player.name}
+                        td #{current.gamePlayer.remainingShots}
+                        td #{current.gamePlayer.score}
         else
             h2 Pas de joueur courant...
 
-        p Coups restants :
-        p Shot
-        button Tir manqué
-        h2 Historique
-        table
-        button Annuler le dernier tir
+        if current
+            h3 Tir
+            form(method= 'POST', action= '/games/' + game.id + '/shots')
+                table
+                    thead
+                        th Secteur
+                        th Multiplicateur
+                    tbody
+                        tr
+                            td
+                                input(type= 'number', name= 'sector')
+                            td
+                                input(type= 'number', name= 'multiplicator')
+
+                button Valider
+                button Tir manqué
+
+        if game.status !== 'draft'
+            h2 Historique
+            table
+                thead
+                    th ID
+                    th Joueur
+                    th Multiplicateur
+                    th Secteur
+                    th Création
+                tbody
+                    each shot in shots
+                        tr
+                            td #{shot.id}
+                            td #{shot.playerId}
+                            td #{shot.multiplicator}
+                            td #{shot.sector}
+                            td #{shot.createdAt.toLocaleDateString("fr-FR") }
+            button Annuler le dernier tir
