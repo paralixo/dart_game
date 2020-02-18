@@ -1,9 +1,11 @@
 html
     head
         title Games
-        link(rel='stylesheet', type='text/css', href='../style/style.css')
+        link(rel='stylesheet', type='text/css', href='../../style/style.css')
     body
-        h1 Joueurs de la partie #{gameId}
+        h1 Partie #{gameId}
+        a(href= '../' + gameId) Retour
+        h1 Joueurs de la partie
         table
             thead
                 th ID
@@ -21,5 +23,31 @@ html
                         td #{player.email}
                         td #{player.gameWin}
                         td #{player.gameLost}
-                        td #{player.createdAt}
-                        td TODO: delete player
+                        td #{player.createdAt.toLocaleDateString("fr-FR")}
+                        td
+                            form(method= 'POST', action= './players?_method=DELETE&id=' + player.id)
+                                input(type="submit" value="Supprimer")
+
+        h1 Joueurs disponibles
+            table
+                thead
+                    th ID
+                    th Nom
+                    th Email
+                    th Victoires
+                    th Défaites
+                    th Création
+                    th Action
+                tbody
+                    each player in availablePlayers
+                        tr
+                            td #{player.id}
+                            td #{player.name}
+                            td #{player.email}
+                            td #{player.gameWin}
+                            td #{player.gameLost}
+                            td #{player.createdAt.toLocaleDateString("fr-FR")}
+                            td
+                                form(method= 'POST', action= './players')
+                                    input(name= 'players[]', type= 'hidden', value= player.id)
+                                    input(type='submit', value='Ajouter joueur')

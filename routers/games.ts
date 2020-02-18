@@ -17,8 +17,10 @@ import {Gamemode} from '../engine/gamemode/Gamemode';
 import {IGamePlayer} from '../engine/game/interfaces/IGamePlayer';
 import {Gamemode301} from '../engine/gamemode/gamemodes/301';
 import {Cricket} from '../engine/gamemode/gamemodes/Cricket';
+import methodOverride from 'method-override'
 
 const router = express.Router()
+router.use(methodOverride('_method'))
 
 router.get('/', async (
     request,
@@ -108,7 +110,9 @@ router.get('/:id', async (
                     }
                 }
             )
-            response.render('games/show', {game, players})
+
+            const currentPlayer = gamePlayers.find(gamePlayer => gamePlayer.id === game.currentPlayerId)
+            response.render('games/show', {game, players, currentPlayer})
         },
         json: () => {
             response.send(game)
@@ -165,10 +169,7 @@ router.patch('/:id', async (
                 index++
             }
 
-            const currentPlayerId: number = gamePlayers.find((gamePlayer) => {
-                if(gamePlayer.order === 1)
-                    return gamePlayer.id
-            })
+            const currentPlayerId: number = gamePlayers.find(gamePlayer => gamePlayer.order === 1).id
             await Game.updateOne(game, {currentPlayerId})
         } else {
             response.send(GAME_PLAYER_MISSING)
@@ -239,15 +240,17 @@ router.get('/:id/players', async (
     response
 ) => {
     const gameId: number = +request.params.id ? +request.params.id : 1;
-    const gamePlayers: any = await GamePlayer.find({gameId});
+    const gamePlayers: any = await GamePlayer.find({gameId}).sort({playerId: 1});
     const players: any[] = [];
     for (const gamePlayer of gamePlayers) {
         players.push(await Player.findOne({id: gamePlayer.playerId}))
     }
     response.format({
-        html: () => {
-            // TODO: charger les joueurs disponibles
-            response.render(`games/${gameId}/players`, {players, gameId})
+        html: async () => {
+            const unavailableGamePlayers: any[] = await GamePlayer.find({gameId})
+            const unavailablePlayersIds: number[] = unavailableGamePlayers.map(gamePlayer => gamePlayer.playerId)
+            const availablePlayers: any[] = await Player.find({id: {$not: {$in: unavailablePlayersIds}}})
+            response.render(`games/players`, {players, availablePlayers, gameId})
         },
         json: () => {
             response.send(players)
@@ -293,7 +296,9 @@ router.delete('/:id/players', async (
     }
 
     // TODO: verify player exist ?
-    const playersIds: number[] = request.body.players ? request.body.players.map(Number).filter((value: number) => !isNaN(value)) : [1];
+    // TODO: faciliter cette putain de ligne
+    const playersIds: number[] = request.query.id ? Array.isArray(request.query.id) ? request.query.id.map(Number).filter((value: number) => !isNaN(value)) : [request.query.id] : [1];
+    console.log(playersIds);
     for (const playerId of playersIds) {
         await GamePlayer.deleteMany({gameId, playerId})
     }

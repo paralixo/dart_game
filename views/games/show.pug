@@ -4,7 +4,7 @@ html
         link(rel='stylesheet', type='text/css', href='../style/style.css')
     body
         h1 Partie #{game.id}
-        a(href='/games/' + game.id + '/players') Gérer les joueurs
+        a(href='/games') Retour
         h2 La partie
         table
             thead
@@ -13,7 +13,6 @@ html
                     th Nom
                     th Mode
                     th Status
-                    th Joueurs
                     th Creation
             tbody
                 tr
@@ -21,10 +20,11 @@ html
                     td #{game.name}
                     td #{game.mode}
                     td #{game.status}
-                    td #{game.gamePlayers.length}
                     td #{game.createdAt.toLocaleDateString("fr-FR")}
 
         h2 Les joueurs
+        if game.status == 'draft'
+            a(href='/games/' + game.id + '/players') Gérer les joueurs
         table
             thead
                 th ID
@@ -43,8 +43,27 @@ html
                         td #{player.gameLost}
                         td #{player.createdAt.toLocaleDateString("fr-FR")}
 
-        h2 Tour de
-        table
+        if currentPlayer
+            h2 Tour de #{currentPlayer.name}
+            table
+                thead
+                    th ID
+                    th Nom
+                    th Email
+                    th Victoires
+                    th Défaites
+                    th Création
+                tbody
+                    tr
+                    td #{currentPlayer.id}
+                    td #{currentPlayer.name}
+                    td #{currentPlayer.email}
+                    td #{currentPlayer.gameWin}
+                    td #{currentPlayer.gameLost}
+                    td #{currentPlayer.createdAt.toLocaleDateString("fr-FR")}
+        else
+            h2 Pas de joueur courant...
+
         p Coups restants :
         p Shot
         button Tir manqué

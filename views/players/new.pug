@@ -5,7 +5,7 @@ html
     body
         h1= title
         a(href='/players') Liste des joueurs
-        form(method='post', action='/players', enctype='application/json')
+        form(method='POST', action='/players' + methodOverride, enctype='application/json')
             label(for='name') Nom
             input(id='name', name='name', type='text', required= true, value=player.name)
             label(for='email') Email

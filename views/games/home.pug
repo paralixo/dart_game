@@ -13,7 +13,6 @@ html
                     th Nom
                     th Mode
                     th Status
-                    th Joueurs
                     th Creation
                     th Actions
             tbody
@@ -23,11 +22,9 @@ html
                         td #{game.name}
                         td #{game.mode}
                         td #{game.status}
-                        td #{game.gamePlayers.length}
                         td #{game.createdAt.toLocaleDateString("fr-FR")}
                         td
-                            p TODO: delete sur la poubelle
                             a(href= 'games/' + game.id)
                                 img(src='../edit_icon.png')
-                            a(href= 'games/' + game.id)
-                                img(src='../delete_icon.png')
+                            form(method= 'POST', action= 'games/' + game.id + '?_method=DELETE', style='display: inline')
+                                input(type='image', src='../delete_icon.png')

@@ -1,8 +1,10 @@
 import express from 'express'
 import {NotAcceptable} from '../errors/Server/NotAcceptable';
 import Player from '../models/Player';
+import methodOverride from 'method-override'
 
 const router = express.Router()
+router.use(methodOverride('_method'))
 
 router.get('/', async (
     request,
@@ -60,7 +62,8 @@ router.get('/new', async (
         html: () => {
             const player = {}
             const title = 'Créer un jouer'
-            response.render('players/new', {player, title});
+            const methodOverride = ""
+            response.render('players/new', {player, title, methodOverride});
         },
         json: () => {
             response.send(NotAcceptable)
@@ -94,7 +97,8 @@ router.get('/:id/edit', async (
         html: async () => {
             const player = await Player.findOne({id: playerId});
             const title: string = 'Mettre à jour le joueur'
-            response.render('players/new', {player, title});
+            const methodOverride: string = `/${playerId}?_method=PATCH`
+            response.render('players/new', {player, title, methodOverride});
         },
         json: () => {
             response.send(NotAcceptable)
@@ -110,21 +114,22 @@ router.patch('/:id', async (
     const name: string = request.body.name ? request.body.name : undefined;
     const email: string = request.body.email ? request.body.email : undefined;
 
+    let updateValues: any = {};
+    // TODO: gestion erreurs
+    if (name !== undefined) {updateValues.name = name}
+    if (email !== undefined) {updateValues.email = email}
+
+    const playerUpdate: any = await Player.findOneAndUpdate(
+        {id: playerId},
+        updateValues,
+        {new: true}
+    )
     response.format({
         html: () => {
             response.redirect('/players')
         },
         json: async () => {
-            let updateValues: any = {};
-            // TODO: gestion erreurs
-            if (name !== undefined) {updateValues.name = name}
-            if (email !== undefined) {updateValues.email = email}
-
-            response.send(await Player.findOneAndUpdate(
-                {id: playerId},
-                updateValues,
-                {new: true}
-            ))
+            response.send(playerUpdate)
         }
     })
 });
@@ -136,15 +141,14 @@ router.delete('/:id', async (
     const playerId: number = +request.params.id ? +request.params.id : 1;
     // TODO: is in a started or ended game
     // and throw PlayerNotDeletable Error
+    const deletedPlayer: any = await Player.findOneAndDelete({id: playerId})
     response.format({
         html: () => {
             response.redirect('/players');
         },
         json: async () => {
             // TODO: stop responding a body
-            response.status(204).send(
-                await Player.findOneAndDelete({id: playerId})
-            )
+            response.status(204).send(deletedPlayer)
         }
     })
 });

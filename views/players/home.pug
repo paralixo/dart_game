@@ -5,6 +5,7 @@ html
     body
         h1 Joueurs
         a(href='/games') Liste des parties
+        a(href='/players/new') Ajouter un joueur
         table
             thead
                 th ID
@@ -24,8 +25,7 @@ html
                         td #{player.gameLost}
                         td #{player.createdAt.toLocaleDateString("fr-FR")}
                         td
-                            p TODO: delete sur la poubelle
                             a(href= 'players/' + player.id)
                                 img(src='../edit_icon.png')
-                            a(href= 'players/' + player.id)
-                                img(src='../delete_icon.png')
+                            form(method= 'POST', action= 'players/' + player.id + '?_method=DELETE', style='display: inline')
+                                input(type='image', src='../delete_icon.png')
