@@ -18,6 +18,7 @@ import {IGamePlayer} from '../engine/game/interfaces/IGamePlayer';
 import {Gamemode301} from '../engine/gamemode/gamemodes/301';
 import {Cricket} from '../engine/gamemode/gamemodes/Cricket';
 import methodOverride from 'method-override'
+import {IGameShot} from '../engine/game/interfaces/IGameShot';
 
 const router = express.Router()
 router.use(methodOverride('_method'))
@@ -112,8 +113,11 @@ router.get('/:id', async (
             )
 
             const currentGamePlayer: any = gamePlayers.find(gamePlayer => gamePlayer.id === game.currentPlayerId)
-            const currentPlayer = players.find(player => player.id === currentGamePlayer.playerId)
-            const current = {gamePlayer: currentGamePlayer, player: currentPlayer}
+            let current = {}
+            if (currentGamePlayer) {
+                const currentPlayer = players.find(player => player.id === currentGamePlayer.playerId)
+                current = {gamePlayer: currentGamePlayer, player: currentPlayer}
+            }
             const shots = await GameShot.find({gameId})
             response.render('games/show', {game, players, current, shots})
         },
@@ -347,12 +351,41 @@ router.post('/:id/shots', async (
     const multiplicator: number = +request.body.multiplicator ? +request.body.multiplicator : 1;
     const sector: number = +request.body.sector ? +request.body.sector : 1;
 
-    await new GameShot({
+    const lastShot: IGameShot = await new GameShot({
          playerId,
          gameId,
          multiplicator,
          sector
-    }).save();
+// tests
+    }).save() as unknown as IGameShot;
+
+    let gamePlayer: any = await GamePlayer.findOne({id: playerId, gameId}) as unknown as IGamePlayer;
+    gamePlayer.remainingShots--;
+    // @ts-ignore
+    gamePlayer = new AroundTheWorld().handleShot(gamePlayer, lastShot);
+    await GamePlayer.findOneAndUpdate(
+        {id: gamePlayer.id},
+        gamePlayer
+    )
+
+    if (gamePlayer.remainingShots <= 0) {
+        const currentPlayerOrder: number = gamePlayer.order;
+        let nextOrder: any = gamePlayer.order + 1
+        if (nextOrder > (await GamePlayer.find({gameId})).length) {
+            nextOrder = 1;
+        }
+        let nextPlayer = await GamePlayer.find({gameId, order: nextOrder}) as any
+        game.currentPlayerId = nextPlayer[0].id;
+        await Game.findOneAndUpdate(
+            {id: game.id},
+            game
+        )
+
+        await GamePlayer.findOneAndUpdate({_id: gamePlayer._id}, {remainingShots: 3})
+    }
+
+
+// tests
 
     response.format({
         html: () => {

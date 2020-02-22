@@ -3,7 +3,7 @@ import {AROUND_THE_WORLD} from './constants/modes';
 import {GameShot} from '../../game/GameShot';
 import {Player} from '../../player/Player';
 import {GamePlayer} from '../../game/GamePlayer';
-import {IAroundTheWorldPlayerStatus} from './IAroundTheWorldPlayerStatus';
+import {IAroundTheWorldPlayerStatus} from './interfaces/IAroundTheWorldPlayerStatus';
 import {FIRST_SECTOR_TO_UNLOCK} from './constants/aroundTheWorld';
 
 export class AroundTheWorld extends Gamemode {
