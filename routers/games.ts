@@ -381,6 +381,7 @@ router.post('/:id/shots', async (
             game
         )
 
+
         await GamePlayer.findOneAndUpdate({_id: gamePlayer._id}, {remainingShots: 3})
     }
 
