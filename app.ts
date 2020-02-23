@@ -26,7 +26,7 @@ app.get('/', (request, response) => {
 });
 
 app.get('/*', (request, response) => {
-    response.sendFile(`${__dirname}/../assets/${request.path}`)
+    response.sendFile(`/${__dirname}/../assets/${request.path}`)
 })
 
 app.listen(3000, () => {
