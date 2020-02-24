@@ -104,5 +104,7 @@ Routes disponibles:
 - Pour la même raison qu'au-dessus, le typescript n'a pas toujours été bien utilisé.
 - N'ayant pas compris comment joindre l'engine et l'API via des EventEmitters, j'ai directement intégré 
 le code de l'engine dans l'API (je suis très intéressé par cette partie de la correction!)
+- Le mode de jeu cricket ne fonctionne pas (uniquement un début de recherche)
+- Dans le mode Tour du monde, le score représente le secteur à atteindre (21 signifie que le joueur a gagné)
 
 *Réalisé par **Florian Lafuente***
