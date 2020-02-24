@@ -5,7 +5,7 @@
   "main": "cli.ts",
   "scripts": {
     "ts-watch": "tsc -w",
-    "dev": "node dist/cli.js",
+    "cli": "node dist/cli.js",
     "start": "tsc && node dist/cli.js",
     "lint": "eslint --fix --ext .ts .",
     "api": "tsc && node dist/app.js"
