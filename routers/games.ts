@@ -74,7 +74,6 @@ router.post('/', async (
     request,
     response
 ) => {
-    console.log(request.body);
     const name: string = request.body.name ? request.body.name : 'Unknown game';
     const mode: string = request.body.mode ? request.body.mode : 'around-the-world';
 
@@ -102,30 +101,43 @@ router.get('/:id', async (
     }
 
     response.format({
-                        html: async () => {
-                            const gamePlayers = await GamePlayer.find({gameId});
-                            const players = await Player.find(
-                                {
-                                    id: {
-                                        // @ts-ignore
-                                        $in: gamePlayers.map(gamePlayer => gamePlayer.playerId)
-                                    }
-                                }
-                            );
+        html: async () => {
+            const gamePlayers = await GamePlayer.find({gameId});
+            const players = await Player.find(
+                {
+                    id: {
+                        // @ts-ignore
+                        $in: gamePlayers.map(gamePlayer => gamePlayer.playerId)
+                    }
+                }
+            );
 
-                            const currentGamePlayer: any = gamePlayers.find(gamePlayer => gamePlayer.id === game.currentPlayerId);
-                            let current = {};
-                            if (currentGamePlayer) {
-                                const currentPlayer = players.find(player => player.id === currentGamePlayer.playerId);
-                                current = {gamePlayer: currentGamePlayer, player: currentPlayer};
-                            }
-                            const shots = await GameShot.find({gameId});
-                            response.render('games/show', {game, players, current, shots});
-                        },
-                        json: () => {
-                            response.send(game);
-                        }
-                    });
+            const currentGamePlayer: any = gamePlayers.find(gamePlayer => gamePlayer.id === game.currentPlayerId);
+            let current: any = {};
+            if (currentGamePlayer) {
+                const currentPlayer = players.find(player => player.id === currentGamePlayer.playerId);
+                current = {gamePlayer: currentGamePlayer, player: currentPlayer};
+            }
+
+            let ranking: any[] = [];
+            if (current.gamePlayer && current.gamePlayer.rank) {
+                current = {};
+                for (let gamePlayer of gamePlayers) {
+                    ranking.push(gamePlayer)
+                }
+                ranking.sort((gpA, gpB) => {
+                    return gpA.rank - gpB.rank
+                })
+            }
+
+
+            const shots = await GameShot.find({gameId});
+            response.render('games/show', {game, players, current, shots, ranking});
+        },
+        json: () => {
+            response.send(game);
+        }
+    });
 });
 
 router.get('/:id/edit', (
@@ -327,9 +339,8 @@ router.delete('/:id/players', async (
     }
 
     // TODO: verify player exist ?
-    // TODO: faciliter cette putain de ligne
+    // TODO: faciliter cette ligne
     const playersIds: number[] = request.query.id ? Array.isArray(request.query.id) ? request.query.id.map(Number).filter((value: number) => !isNaN(value)) : [request.query.id] : [1];
-    console.log(playersIds);
     for (const playerId of playersIds) {
         await GamePlayer.deleteMany({gameId, playerId});
     }
@@ -367,11 +378,21 @@ router.post('/:id/shots', async (
                                                    }) as unknown as IGamePlayer;
 
     if (gamePlayer.rank) {
-        response.send({error: 'xxx NOT_PLAYABALE', message: 'Ce joueur a terminé la partie, il ne peut plus jouer'})
+        response.send({error: 'NOT_PLAYABALE', message: 'Ce joueur a terminé la partie, il ne peut plus jouer'})
     }
 
-    const multiplicator: number = +request.body.multiplicator ? +request.body.multiplicator : 1;
-    const sector: number = +request.body.sector ? +request.body.sector : 1;
+    let multiplicator: number = +request.body.multiplicator ? +request.body.multiplicator : 1;
+    let sector: number = +request.body.sector ? +request.body.sector : 1;
+
+    if (+request.body.sector === 0 && +request.body.multiplicator === 0) {
+        multiplicator = 0;
+        sector = 0;
+    }
+
+    sector = sector > 20 ? 20 : sector;
+    sector = sector < 0 ? 0 : sector;
+    multiplicator = multiplicator > 2 && sector == 20 ? 2 : multiplicator > 3 ? 3 : multiplicator;
+    multiplicator = multiplicator < 0 ? 0 : multiplicator;
 
     const lastShot: IGameShot = await new GameShot({
                                                        playerId,
@@ -382,13 +403,14 @@ router.post('/:id/shots', async (
 
     gamePlayer.remainingShots--;
     // @ts-ignore
-    gamePlayer = new AroundTheWorld().handleShot(gamePlayer, lastShot);
+    gamePlayer = getGameMode(game.mode).handleShot(gamePlayer, lastShot);
     await GamePlayer.findOneAndUpdate(
         {id: gamePlayer.id},
         gamePlayer
     );
 
-    const isPlayerVictorious: boolean = new AroundTheWorld().didIWin(gamePlayer);
+    let isGameOver: boolean = false;
+    const isPlayerVictorious: boolean = getGameMode(game.mode).didIWin(gamePlayer);
     if (isPlayerVictorious) {
         const allCurrentRanks: any[] = await GamePlayer.find({gameId, rank: {$exists: true } }) as unknown as any[];
         let nextRank: number = Math.max(...allCurrentRanks.map(gamePlayer => gamePlayer.rank));
@@ -396,12 +418,47 @@ router.post('/:id/shots', async (
         await GamePlayer.findOneAndUpdate({_id: gamePlayer._id}, {rank: gamePlayer.rank});
 
         await turnNextPlayer(gamePlayer, gameId, game)
+
+        let allGamePlayers: any[] = await GamePlayer.find({gameId});
+        if (allCurrentRanks.length === allGamePlayers.length - 2) {
+            isGameOver = true;
+            let unrankedGamePlayer: any = allGamePlayers.find(gamePlayer => !gamePlayer.rank);
+            unrankedGamePlayer.rank = gamePlayer.rank + 1;
+
+            await GamePlayer.findOneAndUpdate(
+                {id: unrankedGamePlayer.id},
+                unrankedGamePlayer
+            );
+        }
     }
 
     if (gamePlayer.remainingShots <= 0 && !isPlayerVictorious) {
         await turnNextPlayer(gamePlayer, gameId, game)
 
         await GamePlayer.findOneAndUpdate({_id: gamePlayer._id}, {remainingShots: 3});
+    }
+
+    if (isGameOver) {
+        await Game.findOneAndUpdate({id: gameId}, {status: 'ended'})
+        let allGamePlayers: any[] = await GamePlayer.find({gameId});
+        allGamePlayers.sort((gpA, gpB) => gpA.rank - gpB.rank)
+
+        let index: number = 0;
+        for (let gamePlayer of allGamePlayers) {
+            let player: any = await Player.findOne({id: gamePlayer.playerId});
+            if (index === 0) {
+                await Player.findOneAndUpdate(
+                    {id: gamePlayer.playerId},
+                    {gameWin: player.gameWin + 1}
+                )
+            } else {
+                await Player.findOneAndUpdate(
+                    {id: gamePlayer.playerId},
+                    {gameLost: player.gameLost + 1}
+                )
+            }
+            index++;
+        }
     }
 
     response.format({
@@ -426,6 +483,8 @@ async function turnNextPlayer(gamePlayer: any, gameId: number, game: any) {
         {id: game.id},
         game
     );
+
+    return false;
 }
 
 async function findNextPlayer(actualPlayerOrder: number ,gamePlayer: any, gameId: number, numberOfPlayers: number, iteration: number = 1) {

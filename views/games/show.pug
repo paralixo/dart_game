@@ -63,6 +63,19 @@ html
                         td #{current.player.name}
                         td #{current.gamePlayer.remainingShots}
                         td #{current.gamePlayer.score}
+        else if ranking.length > 1
+            h2 Places
+            table
+                thead
+                    th Place
+                    th playerID
+                    th score
+                tbody
+                    each gamePlayer in ranking
+                        tr
+                            td #{gamePlayer.rank}
+                            td #{gamePlayer.playerId}
+                            td #{gamePlayer.score}
         else
             h2 Pas de joueur courant...
 
@@ -76,11 +89,14 @@ html
                     tbody
                         tr
                             td
-                                input(type= 'number', name= 'sector')
+                                input(type= 'number', name= 'sector', value= 1)
                             td
-                                input(type= 'number', name= 'multiplicator')
+                                input(type= 'number', name= 'multiplicator', value= 1)
 
                 button Valider
+            form(method= 'POST', action= '/games/' + game.id + '/shots')
+                input(type= 'hidden', name= 'sector', value= "0")
+                input(type= 'hidden', name= 'multiplicator', value= "0")
                 button Tir manqué
 
         if game.status !== 'draft'
@@ -100,4 +116,5 @@ html
                             td #{shot.multiplicator}
                             td #{shot.sector}
                             td #{shot.createdAt.toLocaleDateString("fr-FR") }
-            button Annuler le dernier tir
+            if game.status !== 'ended'
+                button TODO: Annuler le dernier tir
